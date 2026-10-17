@@ -293,9 +293,6 @@ DBMS-CAR-RENTAL-MANAGEMENT-SYSTEM/
 
 ---
 
-
----
-
 ## 📜 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details. Open-source for academic and educational learning purposes.
