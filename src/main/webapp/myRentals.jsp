@@ -4,184 +4,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rental Details</title>
+    <title>My Rentals - DriveLux Bookings</title>
+    <!-- Fonts -->
+    <!-- Poppins Font Everywhere -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-   	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            background-color: #e3f2fd;
-            font-family: 'Poppins', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 30px;
-        }
-        .rentals-container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
-            text-align: left;
-            width: 100%;
-            max-width: 1600px; 
-            overflow-x: auto;
-        }
-        h3 {
-            color: #1e88e5; 
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 2.2em;
-            font-weight: 600;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.08);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .table thead {
-            background-color: #1976d2; 
-            color: white;
-            font-weight: 500;
-        }
-        .table th, .table td {
-            padding: 12px 15px;
-            text-align: left;
-            vertical-align: middle;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .table th {
-            font-size: 0.95em;
-        }
-        .table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .table tbody tr:hover {
-            background-color: #f0f8ff; 
-        }
-        .status-cell {
-            width: 120px;
-            text-align: center;
-        }
-        .badge {
-            border-radius: 20px;
-            padding: 8px 12px;
-            font-size: 0.85em;
-            font-weight: 400;
-            color: white !important;
-        }
-        .completed-status {
-            background-color: #6c757d !important;
-            width: 120px; 
-            padding: 10px;
-        }
-        .available-status {
-            background-color: #28a745 !important; 
-            width: 120px; 
-            padding: 10px;
-        }
-        .ongoing-status {
-            background-color: #ffc107 !important; 
-            color: #fff !important; 
-            width: 120px; 
-            padding: 10px;
-        }
-        .cancelled-status {
-            background-color: #dc3545 !important; 
-            width: 120px; 
-            padding: 10px;
-        }
-        .error-message {
-            color: #f44336;
-            font-weight: bold;
-            margin-top: 10px;
-            text-align: center;
-        }
-    </style>
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Application CSS -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="rentals-container">
-        <h3><i class="fas fa-car-rental me-2"></i> My Rentals</h3>
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th><i class="fas fa-hashtag me-1"></i> Rental ID</th>
-                    <th><i class="fas fa-signature me-1"></i> Rental Name</th>
-                    <th><i class="fas fa-calendar-alt me-1"></i> Start Date</th>
-                    <th><i class="fas fa-calendar-check me-1"></i> End Date</th>
-                    <th class="status-cell"><i class="fas fa-info-circle me-1"></i> Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%
-                    String customerID = (String) session.getAttribute("customerID");
-                    if (customerID == null) {
-                        response.sendRedirect("login.jsp");
-                        return;
-                    }
 
-                    Connection conn = null;
-                    PreparedStatement stmt = null;
-                    ResultSet rs = null;
+    <!-- Unified Customer Navbar -->
+    <header class="rental-navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="customer-dashboard.jsp">
+                <div class="brand-badge"><i class="fas fa-car-side"></i></div>
+                <span>Drive<span style="color: #60a5fa;">Lux</span></span>
+            </a>
+            
+            <nav class="d-flex align-items-center gap-2">
+                <a class="nav-link" href="customer-dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a class="nav-link" href="availableCars.jsp"><i class="fas fa-car"></i> Available Cars</a>
+                <a class="nav-link active" href="myRentals.jsp"><i class="fas fa-calendar-check"></i> My Rentals</a>
+                <a class="btn-rental btn-rental-outline btn-rental-sm ms-2" href="customer-dashboard.jsp">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </nav>
+        </div>
+    </header>
 
-                    try {
-                        Class.forName("com.mysql.cj.jdbc.Driver");
-                        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/car_rental_db", "root", "trickortreat");
+    <!-- Page Header / Hero -->
+    <section class="page-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="hero-stats-badge">
+                        <i class="fas fa-history text-info"></i> Customer Reservation Records
+                    </div>
+                    <h1>My Vehicle Rentals & History</h1>
+                    <p>Track your ongoing trips, review previous car bookings, and inspect payment and rental details anytime.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <a href="availableCars.jsp" class="btn-rental btn-rental-primary">
+                        <i class="fas fa-plus-circle"></i> New Rental Reservation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                        String query = "SELECT Rental_ID, Rental_Name, Rent_Start_Date, Rent_End_Date, Rental_Status FROM RENTAL WHERE Cust_ID = ?";
-                        stmt = conn.prepareStatement(query);
-                        stmt.setString(1, customerID);
-                        rs = stmt.executeQuery();
+    <!-- Main Content Container -->
+    <main class="container my-5">
+        <%
+            String customerID = (String) session.getAttribute("customerID");
+            if (customerID == null) {
+                response.sendRedirect("login.jsp");
+                return;
+            }
 
-                        boolean hasRentals = false;
-                        while (rs.next()) {
-                            hasRentals = true;
-                            int rentalID = rs.getInt("Rental_ID");
-                            String rentalName = rs.getString("Rental_Name");
-                            String startDate = rs.getString("Rent_Start_Date");
-                            String endDate = rs.getString("Rent_End_Date");
-                            String status = rs.getString("Rental_Status");
-                %>
-                <tr>
-                    <td><%= rentalID %></td>
-                    <td><%= rentalName == null || rentalName.isEmpty() ? "<i class='fas fa-minus-circle text-muted'></i> No Name" : rentalName %></td>
-                    <td><%= startDate %></td>
-                    <td><%= endDate %></td>
-                    <td class="status-cell">
-                        <% if ("Completed".equalsIgnoreCase(status)) { %>
-                            <span class="badge completed-status"><i class="fas fa-check-circle me-1"></i> Completed</span>
-                        <% } else if ("Available".equalsIgnoreCase(status)) { %>
-                            <span class="badge available-status"><i class="fas fa-check me-1"></i> Available</span>
-                        <% } else if ("Ongoing".equalsIgnoreCase(status)) { %>
-                            <span class="badge ongoing-status"><i class="fas fa-play-circle me-1"></i> Ongoing</span>
-                        <% } else if ("Cancelled".equalsIgnoreCase(status)) { %>
-                            <span class="badge cancelled-status"><i class="fas fa-ban me-1"></i> Cancelled</span>
-                        <% } else { %>
-                            <span class="badge bg-warning"><i class="fas fa-question-circle me-1"></i> <%= status %></span>
-                        <% } %>
-                    </td>
-                </tr>
-                <%
-                        }
-                        if (!hasRentals) {
-                            out.println("<tr><td colspan='5' class='text-center text-muted'><i class='fas fa-box-open me-2'></i> No rentals found.</td></tr>");
-                        }
-                    } catch (Exception e) {
-                        out.println("<tr><td colspan='5' class='text-danger error-message'><i class='fas fa-exclamation-triangle me-2'></i> Error fetching data!</td></tr>");
-                        e.printStackTrace();
-                    } finally {
-                        if (rs != null) rs.close();
-                        if (stmt != null) stmt.close();
-                        if (conn != null) conn.close();
-                    }
-                %>
-            </tbody>
-        </table>
-    </div>
+            Connection conn = null;
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+
+            int totalCount = 0;
+            int ongoingCount = 0;
+            int completedCount = 0;
+
+            java.util.List<java.util.Map<String, String>> rentalsList = new java.util.ArrayList<>();
+
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/car_rental_db", "root", "trickortreat");
+
+                String query = "SELECT r.Rental_ID, r.Rental_Name, r.Rent_Start_Date, r.Rent_End_Date, r.Rental_Status, r.Car_Regno, c.Car_Model " +
+                               "FROM Rental r LEFT JOIN Car c ON r.Car_Regno = c.Car_Regno " +
+                               "WHERE r.Cust_ID = ? ORDER BY r.Rental_ID DESC";
+                stmt = conn.prepareStatement(query);
+                stmt.setString(1, customerID);
+                rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    totalCount++;
+                    String status = rs.getString("Rental_Status");
+                    if ("Ongoing".equalsIgnoreCase(status)) ongoingCount++;
+                    if ("Completed".equalsIgnoreCase(status)) completedCount++;
+
+                    java.util.Map<String, String> row = new java.util.HashMap<>();
+                    row.put("id", String.valueOf(rs.getInt("Rental_ID")));
+                    row.put("name", rs.getString("Rental_Name") != null ? rs.getString("Rental_Name") : "Standard Rental");
+                    row.put("startDate", rs.getString("Rent_Start_Date") != null ? rs.getString("Rent_Start_Date") : "N/A");
+                    row.put("endDate", rs.getString("Rent_End_Date") != null ? rs.getString("Rent_End_Date") : "N/A");
+                    row.put("status", status != null ? status : "Available");
+                    row.put("regNo", rs.getString("Car_Regno") != null ? rs.getString("Car_Regno") : "N/A");
+                    row.put("carModel", rs.getString("Car_Model") != null ? rs.getString("Car_Model") : "Rental Vehicle");
+                    rentalsList.add(row);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            }
+        %>
+
+        <!-- Summary Metric Pills -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3" style="border-radius: var(--radius-md); background: #ffffff;">
+                    <div class="stat-icon primary" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold text-dark"><%= totalCount %></div>
+                        <div class="text-muted small">Total Bookings</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3" style="border-radius: var(--radius-md); background: #ffffff;">
+                    <div class="stat-icon warning" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                        <i class="fas fa-road"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold text-warning"><%= ongoingCount %></div>
+                        <div class="text-muted small">Active Ongoing Trips</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3" style="border-radius: var(--radius-md); background: #ffffff;">
+                    <div class="stat-icon success" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold text-success"><%= completedCount %></div>
+                        <div class="text-muted small">Completed Journeys</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rentals Table Card -->
+        <div class="table-card">
+            <div class="table-card-header">
+                <div>
+                    <h3><i class="fas fa-clipboard-list text-primary"></i> Booking History Log</h3>
+                </div>
+                <div class="d-flex gap-2">
+                    <input type="text" id="rentalSearch" class="form-control-custom form-control-sm" placeholder="Filter rentals..." onkeyup="filterRentalTable()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="custom-table" id="rentalsTable">
+                    <thead>
+                        <tr>
+                            <th>Rental ID</th>
+                            <th>Vehicle Model & Reg</th>
+                            <th>Rental Plan</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th class="text-center">Action / Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (rentalsList.isEmpty()) { %>
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fs-2 mb-2 d-block text-secondary"></i>
+                                <h5>No Rental Reservations Found</h5>
+                                <p class="small mb-3">You haven't reserved any vehicles yet. Explore our fleet today!</p>
+                                <a href="availableCars.jsp" class="btn-rental btn-rental-primary btn-rental-sm">Browse Available Cars</a>
+                            </td>
+                        </tr>
+                        <% } else { 
+                            for (java.util.Map<String, String> row : rentalsList) { 
+                                String rId = row.get("id");
+                                String rName = row.get("name");
+                                String sDate = row.get("startDate");
+                                String eDate = row.get("endDate");
+                                String status = row.get("status");
+                                String reg = row.get("regNo");
+                                String model = row.get("carModel");
+
+                                String badgeClass = "badge-available";
+                                String icon = "fa-check";
+                                if ("Completed".equalsIgnoreCase(status)) {
+                                    badgeClass = "badge-completed";
+                                    icon = "fa-check-double";
+                                } else if ("Ongoing".equalsIgnoreCase(status)) {
+                                    badgeClass = "badge-ongoing";
+                                    icon = "fa-play-circle";
+                                } else if ("Cancelled".equalsIgnoreCase(status)) {
+                                    badgeClass = "badge-cancelled";
+                                    icon = "fa-ban";
+                                }
+                        %>
+                        <tr class="rental-row" data-search="<%= rId %> <%= rName %> <%= model %> <%= reg %> <%= status %>">
+                            <td><span class="badge bg-light text-primary border font-monospace px-2 py-1">#<%= rId %></span></td>
+                            <td>
+                                <div class="fw-bold text-dark"><%= model %></div>
+                                <span class="font-monospace text-muted small"><%= reg %></span>
+                            </td>
+                            <td><i class="fas fa-tag text-primary me-1 small"></i> <%= rName %></td>
+                            <td><i class="fas fa-calendar-alt text-muted me-1 small"></i> <%= sDate %></td>
+                            <td><i class="fas fa-calendar-check text-muted me-1 small"></i> <%= eDate %></td>
+                            <td>
+                                <span class="badge-custom <%= badgeClass %>">
+                                    <i class="fas <%= icon %>"></i> <%= status %>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a href="payments.jsp?rentalId=<%= rId %>" class="btn-rental btn-rental-outline btn-rental-sm" title="View or Pay Invoice">
+                                    <i class="fas fa-credit-card text-success"></i> Payment Desk
+                                </a>
+                            </td>
+                        </tr>
+                        <%  } 
+                           } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="rental-footer">
+        <div class="container text-center">
+            <p class="mb-0 small text-muted">&copy; 2025 DriveLux DBMS Car Rental Management System. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS & Filter -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function filterRentalTable() {
+            const query = document.getElementById("rentalSearch").value.toLowerCase().trim();
+            document.querySelectorAll(".rental-row").forEach(row => {
+                const text = row.getAttribute("data-search").toLowerCase();
+                row.style.display = text.includes(query) ? "" : "none";
+            });
+        }
+    </script>
 </body>
 </html>

@@ -5,442 +5,673 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Available Cars</title>
+    <title>Available Cars - DriveLux Fleet</title>
+    <!-- Poppins Font Everywhere -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- jQuery & SweetAlert2 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Application CSS & Confirm Alert -->
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/confirm-alert.js"></script>
     <style>
-        body {
-            background-color: #e3f2fd; 
-           font-family: 'Poppins', sans-serif;
-            color: #333;
-            padding: 30px;
+        .filter-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+        .view-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .view-btn.active {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+        .modal-car-preview {
+            background: #f8fafc;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            margin-bottom: 20px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            align-items: center;
+            gap: 16px;
         }
-        .container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 1200px;
-            overflow: auto; 
-            scrollbar-width: thin;
-            scrollbar-color: #2196f3 #e3f2fd; 
+        .modal-car-thumb {
+            width: 80px;
+            height: 60px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
         }
-        h2 {
-            color: #1e88e5; 
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 600;
-            font-size: 2.5em;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.08);
-            border-radius: 8px;
-            overflow: auto; 
-            scrollbar-width: thin;
-            scrollbar-color: #2196f3 #f9f9f9; 
-        }
-        .table th, .table td {
-            padding: 15px;
-            text-align: center;
-            vertical-align: middle;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .table thead {
-            background-color: #1976d2; 
-            color: white;
-            font-weight: 500;
-        }
-        .table th {
-            font-size: 0.95em;
-        }
-        .table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .table tbody tr:hover {
-            background-color: #f0f8ff; 
-        }
-        .rent-btn {
-            background-color: #2196f3;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            font-weight: 500;
-            font-size: 0.9em;
-        }
-        .rent-btn:hover {
-            background-color: #1976d2;
-        }
-        .rent-form {
-            display: inline-block;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 8px;
-            position: relative;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            animation: fadeIn 0.3s;
-        }
-        @keyframes fadeIn {
-          from {opacity: 0; transform: translateY(-50px);}
-          to {opacity: 1; transform: translateY(0);}
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            cursor: pointer;
-        }
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
-        }
-        .modal h2 {
-            color: #1e88e5;
-            text-align: center;
-            margin-bottom: 25px;
-            font-weight: 600;
-            font-size: 1.8rem;
-        }
-        .form-control {
-            border: 2px solid #a8cfff;
-            border-radius: 6px;
-            padding: 10px 12px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-        .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
-        .btn-primary {
-            background-color: #0d6efd;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
-        }
-        .btn-primary:hover {
-            background-color: #0b5ed7;
-        }
-        .form-label {
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 6px;
-            display: block;
-            font-size: 14px;
-        }
-        .link-text {
-            text-align: center;
-            margin-top: 15px;
-        }
-        .link-text a {
-            color: #0d6efd;
-            text-decoration: none;
-        }
-        .link-text a:hover {
-            text-decoration: underline;
-        }
-        .error-message {
-            color: red;
+        .cost-estimate-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-size: 0.9rem;
-            margin-top: 5px;
-            display: block;
-        }
-        .error-border {
-            border-color: red !important;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2 class="text-center mb-4"><i class="fas fa-car me-2"></i> Available Cars</h2>
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th><i class="fas fa-id-card me-1"></i> Car Reg No</th>
-                <th><i class="fas fa-car-alt me-1"></i> Model</th>
-                <th><i class="fas fa-calendar-alt me-1"></i> Year</th>
-                <th><i class="fas fa-paint-brush me-1"></i> Color</th>
-                <th><i class="fas fa-traffic-light me-1"></i> Status</th>
-                <th><i class="fas fa-handshake me-1"></i> Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <%
-                Connection conn = null;
-                PreparedStatement stmt = null;
-                ResultSet rs = null;
-                try {
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/car_rental_db", "root", "trickortreat");
+    <!-- Unified Navigation Bar -->
+    <header class="rental-navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="customer-dashboard.jsp">
+                <div class="brand-badge"><i class="fas fa-car-side"></i></div>
+                <span>Drive<span style="color: #60a5fa;">Lux</span></span>
+            </a>
+            
+            <nav class="d-flex align-items-center gap-2">
+                <a class="nav-link" href="customer-dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a class="nav-link active" href="availableCars.jsp"><i class="fas fa-car"></i> Available Cars</a>
+                <a class="nav-link" href="myRentals.jsp"><i class="fas fa-calendar-check"></i> My Rentals</a>
+                <a class="btn-rental btn-rental-outline btn-rental-sm ms-2" href="customer-dashboard.jsp">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </nav>
+        </div>
+    </header>
 
-                    String query = "SELECT * FROM CAR WHERE Car_Status = 'Available'";
-                    stmt = conn.prepareStatement(query);
-                    rs = stmt.executeQuery();
+    <!-- Page Header / Hero -->
+    <section class="page-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="hero-stats-badge">
+                        <i class="fas fa-check-double text-success"></i> Real-time Fleet Inventory
+                    </div>
+                    <h1>Available Fleet Ready to Rent</h1>
+                    <p>Discover our meticulously maintained selection of cars. Compare models, check real-world specifications, and rent instantly with transparent pricing.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <div class="d-inline-flex bg-white rounded-pill p-1 shadow-sm border">
+                        <button class="view-btn active" id="viewCardsBtn" onclick="switchView('cards')">
+                            <i class="fas fa-th-large me-1"></i> Grid Cards
+                        </button>
+                        <button class="view-btn" id="viewTableBtn" onclick="switchView('table')">
+                            <i class="fas fa-list me-1"></i> Data Table
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    boolean hasAvailableCars = false;
-                    while (rs.next()) {
-                        hasAvailableCars = true;
-                        String regNo = rs.getString("Car_Regno");
-                        String model = rs.getString("Car_Model");
-                        int year = rs.getInt("Car_Year");
-                        String color = rs.getString("Car_Color");
-                        String status = rs.getString("Car_Status");
-            %>
-            <tr>
-                <td><%= regNo %></td>
-                <td><%= model %></td>
-                <td><%= year %></td>
-                <td><%= color %></td>
-                <td><span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> <%= status %></span></td>
-                <td>
-                    <button class="rent-btn" onclick="openModal('<%= regNo %>', '<%= status %>')"><i class="fas fa-key me-1"></i> Rent Now</button>
-                </td>
-            </tr>
-            <%
-                    }
-                    if (!hasAvailableCars) {
-                        out.println("<tr><td colspan='6' class='text-center text-muted'><i class='fas fa-car-crash me-2'></i> No cars currently available.</td></tr>");
-                    }
-                } catch (Exception e) {
-                    out.println("<tr><td colspan='6' class='text-danger'><i class='fas fa-exclamation-triangle me-2'></i> Error fetching data!</td></tr>");
-                    e.printStackTrace();
-                } finally {
-                    if (rs != null) rs.close();
-                    if (stmt != null) stmt.close();
-                    if (conn != null) conn.close();
+    <!-- Main Fleet View Container -->
+    <main class="container my-5">
+        <!-- Search and Filter Bar -->
+        <div class="card border-0 shadow-sm p-3 mb-4" style="border-radius: var(--radius-lg); background: #ffffff;">
+            <div class="row g-3 align-items-center">
+                <div class="col-lg-5">
+                    <div class="input-with-icon">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="form-control-custom" 
+                               placeholder="Search available cars by model, year, or color..." onkeyup="filterCars()">
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                        <button class="filter-btn active" onclick="filterCategory('all', this)">All Types</button>
+                        <button class="filter-btn" onclick="filterCategory('Sedan', this)">Sedans</button>
+                        <button class="filter-btn" onclick="filterCategory('SUV', this)">SUVs</button>
+                        <button class="filter-btn" onclick="filterCategory('Hatchback', this)">Hatchbacks</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%
+            Connection conn = null;
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            boolean hasAvailableCars = false;
+
+            // Structure to hold car data for both views
+            java.util.List<java.util.Map<String, String>> carList = new java.util.ArrayList<>();
+
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/car_rental_db", "root", "trickortreat");
+
+                String query = "SELECT * FROM Car WHERE Car_Status = 'Available'";
+                stmt = conn.prepareStatement(query);
+                rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    hasAvailableCars = true;
+                    java.util.Map<String, String> c = new java.util.HashMap<>();
+                    c.put("regNo", rs.getString("Car_Regno"));
+                    c.put("model", rs.getString("Car_Model"));
+                    c.put("year", String.valueOf(rs.getInt("Car_Year")));
+                    c.put("color", rs.getString("Car_Color"));
+                    c.put("status", rs.getString("Car_Status"));
+                    carList.add(c);
                 }
-            %>
-        </tbody>
-    </table>
-</div>
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            }
+        %>
 
-<div id="rentModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2><i class="fas fa-handshake me-2"></i> Rent Car</h2>
-        <form action="processRent" method="post" id="rental">
-            <input type="hidden" name="carRegno" id="modalCarRegno">
-            <input type="hidden" name="rentalStatus" id="modalRentalStatus">
+        <!-- 1. GRID CARDS VIEW (DEFAULT & IMPRESSIVE) -->
+        <div id="cardsViewContainer">
+            <% if (!hasAvailableCars) { %>
+                <div class="text-center py-5">
+                    <div class="stat-icon warning mx-auto mb-3" style="width: 64px; height: 64px;">
+                        <i class="fas fa-car-crash"></i>
+                    </div>
+                    <h4>No Cars Currently Available</h4>
+                    <p class="text-muted">All vehicles in our fleet are currently booked or undergoing maintenance. Please check back shortly.</p>
+                </div>
+            <% } else { %>
+                <div class="row g-4" id="carCardsRow">
+                    <% for (java.util.Map<String, String> car : carList) { 
+                        String regNo = car.get("regNo");
+                        String model = car.get("model");
+                        String year = car.get("year");
+                        String color = car.get("color");
+                        String status = car.get("status");
+                    %>
+                    <div class="col-md-6 col-lg-4 car-card-col" data-model="<%= model %>" data-color="<%= color %>" data-year="<%= year %>" data-reg="<%= regNo %>">
+                        <div class="car-card">
+                            <div class="car-card-img-wrap">
+                                <img src="Resources/Luxury Sedan.jpg" id="img-<%= regNo %>" alt="<%= model %>" onerror="this.src='Resources/Luxury Sedan.jpg'">
+                                <span class="car-badge-type" id="type-<%= regNo %>">Sedan</span>
+                                <span class="car-badge-status badge-custom badge-available">
+                                    <i class="fas fa-check-circle"></i> <%= status %>
+                                </span>
+                            </div>
+                            <div class="car-card-body">
+                                <h4 class="car-card-title"><%= model %></h4>
+                                <span class="car-card-reg"><%= regNo %> • Year <%= year %> • <%= color %></span>
+                                
+                                <div class="car-specs-grid">
+                                    <div class="spec-item" id="trans-<%= regNo %>"><i class="fas fa-cog"></i> Auto</div>
+                                    <div class="spec-item" id="fuel-<%= regNo %>"><i class="fas fa-gas-pump"></i> Petrol</div>
+                                    <div class="spec-item" id="seats-<%= regNo %>"><i class="fas fa-users"></i> 5 Seats</div>
+                                    <div class="spec-item" id="mileage-<%= regNo %>"><i class="fas fa-tachometer-alt"></i> 18 km/l</div>
+                                </div>
 
-            <div class="mb-3">
-                <label for="rentalName" class="form-label"><i class="fas fa-file-signature me-1"></i> Rental Name</label>
-                <select name="rentalName" id="rentalName" class="form-control" >
-                    <option value="" disabled selected>Select Rental Type</option>
-                    <option value="Business Lease">Business Lease</option>
-                    <option value="Corporate Rental">Corporate Rental</option>
-                    <option value="Personal Trip">Personal Trip</option>
-                    <option value="Travel Agency">Travel Agency</option>
-                    <option value="Event Rental">Event Rental</option>
-                    <option value="VIP Service">VIP Service</option>
-                    <option value="Government Contract">Government Contract</option>
-                    <option value="Luxury Chauffeur">Luxury Chauffeur</option>
-                    <option value="Long-Term Lease">Long-Term Lease</option>
-                    <option value="Ride Sharing Partner">Ride Sharing Partner</option>
-                </select>
-                <div id="rentalName-error" class="error-message"></div>
+                                <div class="car-card-footer">
+                                    <div class="car-price-block">
+                                        <span class="price-value" id="price-<%= regNo %>">&#8377;2,200</span>
+                                        <span class="price-period">per day</span>
+                                    </div>
+                                    <button class="btn-rental btn-rental-primary btn-rental-sm" onclick="openModal('<%= regNo %>', '<%= status %>', '<%= model %>')">
+                                        <i class="fas fa-key"></i> Rent Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- 2. DATA TABLE VIEW (SYNCHRONIZED POWER USER OPTION) -->
+        <div id="tableViewContainer" style="display: none;">
+            <div class="table-card">
+                <div class="table-card-header">
+                    <h3><i class="fas fa-list-alt text-primary"></i> Available Inventory Register</h3>
+                    <span class="badge bg-primary px-3 py-2 rounded-pill"><%= carList.size() %> Cars Ready</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table" id="availableCarsTable">
+                        <thead>
+                            <tr>
+                                <th>Car Photo</th>
+                                <th>Registration</th>
+                                <th>Vehicle Model</th>
+                                <th>Model Year</th>
+                                <th>Exterior Color</th>
+                                <th>Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (java.util.Map<String, String> car : carList) { 
+                                String regNo = car.get("regNo");
+                                String model = car.get("model");
+                                String year = car.get("year");
+                                String color = car.get("color");
+                                String status = car.get("status");
+                            %>
+                            <tr class="car-table-row" data-model="<%= model %>" data-color="<%= color %>" data-year="<%= year %>" data-reg="<%= regNo %>">
+                                <td>
+                                    <img src="Resources/Luxury Sedan.jpg" id="tbl-img-<%= regNo %>" style="width: 70px; height: 48px; border-radius: 6px; object-fit: cover;" onerror="this.src='Resources/Luxury Sedan.jpg'" alt="<%= model %>">
+                                </td>
+                                <td><span class="font-monospace fw-bold text-dark"><%= regNo %></span></td>
+                                <td>
+                                    <div class="fw-bold text-primary"><%= model %></div>
+                                    <small class="text-muted" id="tbl-type-<%= regNo %>">Standard Vehicle</small>
+                                </td>
+                                <td><%= year %></td>
+                                <td><i class="fas fa-circle me-1 small" style="color: #64748b;"></i> <%= color %></td>
+                                <td>
+                                    <span class="badge-custom badge-available">
+                                        <i class="fas fa-check-circle"></i> <%= status %>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn-rental btn-rental-primary btn-rental-sm" onclick="openModal('<%= regNo %>', '<%= status %>', '<%= model %>')">
+                                        <i class="fas fa-key"></i> Rent Now
+                                    </button>
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </div>
+    </main>
 
-            <div class="mb-3">
-                <label for="rentStartDate" class="form-label"><i class="fas fa-calendar-alt me-1"></i> Start Date</label>
-                <input type="date" name="rentStartDate" id="rentStartDate" class="form-control" >
-                <div id="rentStartDate-error" class="error-message"></div>
+    <!-- Rental Booking Modal (Preserves all form inputs & processRent servlet integration) -->
+    <div id="rentModal" class="modal-rental">
+        <div class="modal-rental-content">
+            <div class="modal-rental-header">
+                <h3><i class="fas fa-key me-2 text-primary"></i> Reserve Vehicle</h3>
+                <button type="button" class="modal-rental-close" onclick="closeModal()">&times;</button>
             </div>
+            
+            <div class="modal-rental-body">
+                <!-- Selected Vehicle Preview -->
+                <div class="modal-car-preview">
+                    <img id="modalCarThumb" src="Resources/Luxury Sedan.jpg" class="modal-car-thumb" alt="Car">
+                    <div>
+                        <h5 class="fw-bold mb-1" id="modalCarModelDisplay">Vehicle Model</h5>
+                        <div class="small text-muted font-monospace" id="modalCarRegDisplay">Reg No</div>
+                    </div>
+                </div>
 
-            <div class="mb-3">
-                <label for="rentEndDate" class="form-label"><i class="fas fa-calendar-check me-1"></i> End Date</label>
-                <input type="date" name="rentEndDate" id="rentEndDate" class="form-control" >
-                <div id="rentEndDate-error" class="error-message"></div>
+                <!-- Live Duration & Cost Estimate -->
+                <div class="cost-estimate-box" id="costEstimateBox">
+                    <div>
+                        <span class="text-muted">Estimated Duration:</span> <strong id="estDuration">1 Day</strong>
+                    </div>
+                    <div>
+                        <span class="text-muted">Total Rent:</span> <strong class="text-primary fs-5" id="estPrice">&#8377;2,200</strong>
+                    </div>
+                </div>
+
+                <!-- Form to processRent servlet -->
+                <form action="processRent" method="post" id="rental">
+                    <input type="hidden" name="carRegno" id="modalCarRegno">
+                    <input type="hidden" name="rentalStatus" id="modalRentalStatus">
+
+                    <div class="form-group-custom">
+                        <label for="rentalName" class="form-label-custom">
+                            <i class="fas fa-file-signature text-primary me-1"></i> Rental Plan / Purpose
+                        </label>
+                        <select name="rentalName" id="rentalName" class="form-control-custom" required>
+                            <option value="" disabled selected>Select Rental Category</option>
+                            <option value="Personal Trip">Personal Trip (Vacation / Leisure)</option>
+                            <option value="Business Lease">Business Lease</option>
+                            <option value="Corporate Rental">Corporate Rental</option>
+                            <option value="Travel Agency">Travel Agency Tour</option>
+                            <option value="Event Rental">Event / Wedding Rental</option>
+                            <option value="VIP Service">VIP Luxury Chauffeur</option>
+                            <option value="Government Contract">Government Contract</option>
+                            <option value="Long-Term Lease">Long-Term Monthly Lease</option>
+                            <option value="Ride Sharing Partner">Ride Sharing Partner</option>
+                        </select>
+                        <div id="rentalName-error" class="error-message"></div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label for="rentStartDate" class="form-label-custom">
+                                    <i class="fas fa-calendar-alt text-primary me-1"></i> Start Date
+                                </label>
+                                <input type="date" name="rentStartDate" id="rentStartDate" class="form-control-custom" required>
+                                <div id="rentStartDate-error" class="error-message"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label for="rentEndDate" class="form-label-custom">
+                                    <i class="fas fa-calendar-check text-primary me-1"></i> End Date
+                                </label>
+                                <input type="date" name="rentEndDate" id="rentEndDate" class="form-control-custom" required>
+                                <div id="rentEndDate-error" class="error-message"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitRentBtn" class="btn-rental btn-rental-primary w-100 py-3 mt-3">
+                        <i class="fas fa-check-circle"></i> Confirm Reservation & Pay
+                    </button>
+                </form>
             </div>
-
-            <button type="submit" class="btn btn-primary"><i class="fas fa-check me-1"></i> Submit Rental</button>
-        </form>
+        </div>
     </div>
-</div>
 
+    <!-- Footer -->
+    <footer class="rental-footer">
+        <div class="container text-center">
+            <p class="mb-0 small text-muted">&copy; 2025 DriveLux DBMS Car Rental Management System. All Rights Reserved.</p>
+        </div>
+    </footer>
 
-<script>
-    function openModal(regNo, status) {
-        document.getElementById('modalCarRegno').value = regNo;
-        document.getElementById('modalRentalStatus').value = status;
-        document.getElementById('rentModal').style.display = "block";
-    }
+    <!-- Vehicle Specs & Image Loader Script -->
+    <script src="js/car-data.js"></script>
+    <script>
+        let currentSelectedCarRate = 2200;
 
-    function closeModal() {
-        document.getElementById('rentModal').style.display = "none";
-    }
+        // Initialize car images & specs from CAR_CATALOG
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".car-card-col").forEach(col => {
+                const reg = col.getAttribute("data-reg");
+                const model = col.getAttribute("data-model");
+                const details = getCarDetails(model);
 
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('rentModal')) {
-            closeModal();
-        }
-    }
-
-
-
-    const rentalForm = document.getElementById("rental");
-    const rentalNameInput = document.getElementById("rentalName");
-    const rentStartDateInput = document.getElementById("rentStartDate");
-    const rentEndDateInput = document.getElementById("rentEndDate");
-
-    const rentalNameError = document.getElementById("rentalName-error");
-    const rentStartDateError = document.getElementById("rentStartDate-error");
-    const rentEndDateError = document.getElementById("rentEndDate-error");
-
-
-    function validateRentalName() {
-        const rentalNameValue = rentalNameInput.value.trim();
-        if (rentalNameValue === "") {
-            rentalNameError.textContent = "Please select a rental type";
-            rentalNameInput.classList.add("error-border");
-            return false;
-        } else {
-            rentalNameError.textContent = "";
-            rentalNameInput.classList.remove("error-border");
-            return true;
-        }
-    }
-
-    function validateStartDate() {
-        const startDateValue = rentStartDateInput.value;
-        const today = new Date().toISOString().split("T")[0];
-
-        if (startDateValue === "") {
-            rentStartDateError.textContent = "Please enter start date";
-            rentStartDateInput.classList.add("error-border");
-            return false;
-        } else if (startDateValue < today) {
-            rentStartDateError.textContent = "Start date must be future or current date";
-            rentStartDateInput.classList.add("error-border");
-            return false;
-        } else {
-            rentStartDateError.textContent = "";
-            rentStartDateInput.classList.remove("error-border");
-            return true;
-        }
-    }
-
-    function validateEndDate() {
-        const endDateValue = rentEndDateInput.value;
-        const startDateValue = rentStartDateInput.value;
-
-        if (endDateValue === "") {
-            rentEndDateError.textContent = "Please enter end date";
-            rentEndDateInput.classList.add("error-border");
-            return false;
-        } else if (startDateValue && endDateValue < startDateValue) {
-            rentEndDateError.textContent = "End date must be after start date";
-            rentEndDateInput.classList.add("error-border");
-            return false;
-        } else {
-            rentEndDateError.textContent = "";
-            rentEndDateInput.classList.remove("error-border");
-            return true;
-        }
-    }
-
-
-
-    rentalNameInput.addEventListener("input", validateRentalName);
-    rentStartDateInput.addEventListener("input", validateStartDate);
-    rentEndDateInput.addEventListener("input", validateEndDate);
-
-
-    rentalForm.addEventListener("submit", function(event) {
-        event.preventDefault();
-
-        const isRentalNameValid = validateRentalName();
-        const isStartDateValid = validateStartDate();
-        const isEndDateValid = validateEndDate();
-
-        if (isRentalNameValid && isStartDateValid && isEndDateValid) {
-             fetch('processRent', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams(new FormData(rentalForm)),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error(errorData.message || 'Failed to process rental');
-                    });
+                // Set Card Elements
+                const img = document.getElementById("img-" + reg);
+                if (img) {
+                    img.src = details.image;
+                    img.onerror = function() { this.src = details.fallbackImage; };
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === 'success') {
-                    Swal.fire({
-                        title: "Rental Successful!",
-                        text:  "Rental successfully inserted! Your Rental ID is : " + data.rentalId,
-                        icon: "success",
-                    }).then(() => {
-                         window.location.href = "payments.jsp?rentalId=" + data.rentalId;
-                    });
-                   
-                } else {
-                    Swal.fire({
-                        title: "Error",
-                        text: data.message || "An error occurred",
-                        icon: "error",
-                    });
+                const type = document.getElementById("type-" + reg);
+                if (type) type.textContent = details.category;
+                const trans = document.getElementById("trans-" + reg);
+                if (trans) trans.innerHTML = `<i class="fas fa-cog"></i> ` + details.transmission;
+                const fuel = document.getElementById("fuel-" + reg);
+                if (fuel) fuel.innerHTML = `<i class="fas fa-gas-pump"></i> ` + details.fuel;
+                const seats = document.getElementById("seats-" + reg);
+                if (seats) seats.innerHTML = `<i class="fas fa-users"></i> ` + details.seats + ` Seats`;
+                const mileage = document.getElementById("mileage-" + reg);
+                if (mileage) mileage.innerHTML = `<i class="fas fa-tachometer-alt"></i> ` + details.mileage;
+                const price = document.getElementById("price-" + reg);
+                if (price) price.innerHTML = `&#8377;` + details.dailyRate.toLocaleString('en-IN');
+
+                // Set Table Elements
+                const tblImg = document.getElementById("tbl-img-" + reg);
+                if (tblImg) {
+                    tblImg.src = details.image;
+                    tblImg.onerror = function() { this.src = details.fallbackImage; };
                 }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                 Swal.fire({
-                        title: "Error",
-                        text: error.message || "An unexpected error occurred",
-                        icon: "error",
-                    });
+                const tblType = document.getElementById("tbl-type-" + reg);
+                if (tblType) tblType.textContent = details.category + " • " + details.transmission;
+            });
+
+            // Set default dates to today and tomorrow
+            const today = new Date().toISOString().split("T")[0];
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+            document.getElementById("rentStartDate").value = today;
+            document.getElementById("rentEndDate").value = tomorrow;
+            updateCostEstimate();
+        });
+
+        // View Switcher (Cards vs Table)
+        function switchView(view) {
+            const cardsContainer = document.getElementById("cardsViewContainer");
+            const tableContainer = document.getElementById("tableViewContainer");
+            const cardsBtn = document.getElementById("viewCardsBtn");
+            const tableBtn = document.getElementById("viewTableBtn");
+
+            if (view === 'cards') {
+                cardsContainer.style.display = "block";
+                tableContainer.style.display = "none";
+                cardsBtn.classList.add("active");
+                tableBtn.classList.remove("active");
+            } else {
+                cardsContainer.style.display = "none";
+                tableContainer.style.display = "block";
+                cardsBtn.classList.remove("active");
+                tableBtn.classList.add("active");
+            }
+        }
+
+        // Live Search Filter
+        function filterCars() {
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
+            document.querySelectorAll(".car-card-col").forEach(col => {
+                const text = (col.getAttribute("data-model") + " " + col.getAttribute("data-color") + " " + col.getAttribute("data-year") + " " + col.getAttribute("data-reg")).toLowerCase();
+                col.style.display = text.includes(query) ? "block" : "none";
+            });
+            document.querySelectorAll(".car-table-row").forEach(row => {
+                const text = (row.getAttribute("data-model") + " " + row.getAttribute("data-color") + " " + row.getAttribute("data-year") + " " + row.getAttribute("data-reg")).toLowerCase();
+                row.style.display = text.includes(query) ? "" : "none";
             });
         }
-    });
-</script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        // Category Filter
+        function filterCategory(category, btnElement) {
+            document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            if (btnElement) btnElement.classList.add("active");
 
+            document.querySelectorAll(".car-card-col").forEach(col => {
+                const model = col.getAttribute("data-model");
+                const details = getCarDetails(model);
+                if (category === 'all' || details.category.toLowerCase().includes(category.toLowerCase())) {
+                    col.style.display = "block";
+                } else {
+                    col.style.display = "none";
+                }
+            });
+            document.querySelectorAll(".car-table-row").forEach(row => {
+                const model = row.getAttribute("data-model");
+                const details = getCarDetails(model);
+                if (category === 'all' || details.category.toLowerCase().includes(category.toLowerCase())) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        // Modal Open / Close
+        function openModal(regNo, status, model) {
+            document.getElementById('modalCarRegno').value = regNo;
+            document.getElementById('modalRentalStatus').value = status;
+            document.getElementById('modalCarModelDisplay').textContent = model || "Vehicle";
+            document.getElementById('modalCarRegDisplay').textContent = "Reg No: " + regNo;
+
+            const details = getCarDetails(model);
+            currentSelectedCarRate = details.dailyRate;
+            document.getElementById('modalCarThumb').src = details.image;
+            document.getElementById('modalCarThumb').onerror = function() { this.src = details.fallbackImage; };
+
+            updateCostEstimate();
+            document.getElementById('rentModal').style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById('rentModal').style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('rentModal')) {
+                closeModal();
+            }
+        };
+
+        // Date & Cost Calculation
+        function updateCostEstimate() {
+            const startVal = document.getElementById("rentStartDate").value;
+            const endVal = document.getElementById("rentEndDate").value;
+            if (startVal && endVal) {
+                const s = new Date(startVal);
+                const e = new Date(endVal);
+                const diffTime = e - s;
+                let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (days <= 0) days = 1;
+
+                document.getElementById("estDuration").textContent = days + (days === 1 ? " Day" : " Days");
+                const total = days * currentSelectedCarRate;
+                document.getElementById("estPrice").innerHTML = `&#8377;` + total.toLocaleString('en-IN');
+            }
+        }
+
+        const rentalForm = document.getElementById("rental");
+        const rentalNameInput = document.getElementById("rentalName");
+        const rentStartDateInput = document.getElementById("rentStartDate");
+        const rentEndDateInput = document.getElementById("rentEndDate");
+        const submitRentBtn = document.getElementById("submitRentBtn");
+
+        const rentalNameError = document.getElementById("rentalName-error");
+        const rentStartDateError = document.getElementById("rentStartDate-error");
+        const rentEndDateError = document.getElementById("rentEndDate-error");
+
+        function validateRentalName() {
+            if (rentalNameInput.value.trim() === "") {
+                rentalNameError.textContent = "Please select a rental category";
+                rentalNameInput.classList.add("error-border");
+                return false;
+            } else {
+                rentalNameError.textContent = "";
+                rentalNameInput.classList.remove("error-border");
+                return true;
+            }
+        }
+
+        function validateStartDate() {
+            const startDateValue = rentStartDateInput.value;
+            const today = new Date().toISOString().split("T")[0];
+
+            if (startDateValue === "") {
+                rentStartDateError.textContent = "Please select journey start date";
+                rentStartDateInput.classList.add("error-border");
+                return false;
+            } else if (startDateValue < today) {
+                rentStartDateError.textContent = "Start date must be current or future date";
+                rentStartDateInput.classList.add("error-border");
+                return false;
+            } else {
+                rentStartDateError.textContent = "";
+                rentStartDateInput.classList.remove("error-border");
+                return true;
+            }
+        }
+
+        function validateEndDate() {
+            const endDateValue = rentEndDateInput.value;
+            const startDateValue = rentStartDateInput.value;
+
+            if (endDateValue === "") {
+                rentEndDateError.textContent = "Please select journey return date";
+                rentEndDateInput.classList.add("error-border");
+                return false;
+            } else if (startDateValue && endDateValue < startDateValue) {
+                rentEndDateError.textContent = "Return date must be equal or after start date";
+                rentEndDateInput.classList.add("error-border");
+                return false;
+            } else {
+                rentEndDateError.textContent = "";
+                rentEndDateInput.classList.remove("error-border");
+                return true;
+            }
+        }
+
+        rentalNameInput.addEventListener("change", validateRentalName);
+        rentStartDateInput.addEventListener("input", () => { validateStartDate(); updateCostEstimate(); });
+        rentEndDateInput.addEventListener("input", () => { validateEndDate(); updateCostEstimate(); });
+
+        rentalForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const isRentalNameValid = validateRentalName();
+            const isStartDateValid = validateStartDate();
+            const isEndDateValid = validateEndDate();
+
+            if (isRentalNameValid && isStartDateValid && isEndDateValid) {
+                confirmAction({
+                    title: "Confirm Vehicle Reservation",
+                    text: "Are you sure you want to proceed with reserving this vehicle?",
+                    confirmText: "Yes, Reserve",
+                    cancelText: "Cancel",
+                    onConfirm: function() {
+                        submitRentBtn.disabled = true;
+                        submitRentBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reserving Vehicle...';
+
+                        fetch('processRent', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: new URLSearchParams(new FormData(rentalForm)),
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(errorData => {
+                                    throw new Error(errorData.message || 'Failed to process rental reservation');
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            submitRentBtn.disabled = false;
+                            submitRentBtn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Reservation & Pay';
+
+                            if (data.status === 'success') {
+                                closeModal();
+                                Swal.fire({
+                                    title: "Vehicle Reserved!",
+                                    html: "Your rental reservation has been recorded successfully.<br><br><strong>Rental Reference ID: <span style='color: #2563eb; font-size: 1.3rem;'>" + data.rentalId + "</span></strong><br><small class='text-muted'>Proceeding to complete payment checkout...</small>",
+                                    icon: "success",
+                                    confirmButtonText: "Proceed to Payment",
+                                    confirmButtonColor: "#2563eb"
+                                }).then(() => {
+                                    window.location.href = "payments.jsp?rentalId=" + data.rentalId;
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: "Reservation Error",
+                                    text: data.message || "An error occurred while booking.",
+                                    icon: "error",
+                                    confirmButtonColor: "#2563eb"
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            submitRentBtn.disabled = false;
+                            submitRentBtn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Reservation & Pay';
+
+                            Swal.fire({
+                                title: "System Error",
+                                text: error.message || "An unexpected error occurred.",
+                                icon: "error",
+                                confirmButtonColor: "#2563eb"
+                            });
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

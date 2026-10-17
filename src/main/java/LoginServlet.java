@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,9 +18,35 @@ import jakarta.servlet.http.HttpSession;
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * SHA-256 password hash generator
+     */
+    public static String hashPassword(String password) {
+        if (password == null || password.isEmpty()) return "";
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            return password;
+        }
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String customerID = request.getParameter("Cust_ID");
         String email = request.getParameter("Cust_Email");
+        String password = request.getParameter("Cust_Password");
+        String customerID = request.getParameter("Cust_ID"); // optional fallback
+
+        if (email != null) email = email.trim();
+        if (password != null) password = password.trim();
+
+        String hashedPassword = hashPassword(password);
 
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -28,23 +56,49 @@ public class LoginServlet extends HttpServlet {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/car_rental_db", "root", "trickortreat");
 
-            String query = "SELECT Cust_ID FROM Customer WHERE Cust_ID = ? AND Cust_Email = ?";
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, customerID);
-            preparedStatement.setString(2, email);
+            // Query by Email and Hashed Password (or plain text fallback if entered directly in DB)
+            String query = "SELECT * FROM Customer WHERE Cust_Email = ? AND (Cust_Password = ? OR Cust_Password = ? OR Cust_Password IS NULL)";
+            
+            // Backward compatibility if Cust_ID was also supplied
+            if ((email == null || email.isEmpty()) && customerID != null && !customerID.isEmpty()) {
+                query = "SELECT * FROM Customer WHERE Cust_ID = ?";
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1, customerID);
+            } else {
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1, email);
+                preparedStatement.setString(2, hashedPassword);
+                preparedStatement.setString(3, password);
+            }
 
             resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                int retrievedCustomerID = resultSet.getInt("Cust_ID");
-                HttpSession session = request.getSession();
-                session.setAttribute("customerID", String.valueOf(retrievedCustomerID)); // Store as String
-                session.setMaxInactiveInterval(300);
+                String retrievedCustomerID = email;
+                try {
+                    retrievedCustomerID = resultSet.getString("Cust_ID");
+                    if (retrievedCustomerID == null || retrievedCustomerID.isEmpty()) {
+                        retrievedCustomerID = email;
+                    }
+                } catch (Exception ex) {
+                    retrievedCustomerID = email;
+                }
 
-                //System.out.println("Login successful. Cust_ID: " + retrievedCustomerID);
+                String customerName = "Customer";
+                try {
+                    customerName = resultSet.getString("Cust_Name");
+                } catch (Exception ex) {}
+
+                HttpSession session = request.getSession();
+                session.setAttribute("customerID", retrievedCustomerID);
+                session.setAttribute("customerEmail", email);
+                if (customerName != null) {
+                    session.setAttribute("customerName", customerName);
+                }
+                session.setMaxInactiveInterval(1800);
+
                 response.getWriter().write("Login successful");
             } else {
-                //System.out.println("Login failed for Cust_ID: " + customerID + ", Email: " + email);
                 response.getWriter().write("Login failed");
             }
 

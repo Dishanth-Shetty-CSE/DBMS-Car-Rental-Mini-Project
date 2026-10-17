@@ -1,325 +1,242 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Update Rental</title>
-<link
-	href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap"
-	rel="stylesheet">
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<style>
-body {
-	background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-	font-family: 'Poppins', sans-serif;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	min-height: 100vh;
-	margin: 0;
-}
-
-.container {
-	background-color: #fff;
-	padding: 40px;
-	border-radius: 12px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	width: 90%;
-	max-width: 600px;
-}
-
-h2 {
-	color: #1976d2;
-	text-align: center;
-	margin-bottom: 30px;
-	font-weight: bolder;
-	letter-spacing: 0.5px;
-}
-
-.table {
-	margin-bottom: 20px;
-	border-collapse: separate;
-	border-spacing: 0;
-	width: 100%;
-	border-radius: 8px;
-	overflow: hidden;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.table thead th {
-	background-color: #1976d2;
-	color: #fff;
-	font-weight: 500;
-	text-align: left;
-	padding: 14px 18px;
-	border-bottom: 2px solid #1565c0;
-}
-
-.table tbody td {
-	padding: 12px 18px;
-	border-bottom: 1px solid #e0e0e0;
-}
-
-.table tbody tr:last-child td {
-	border-bottom: none;
-}
-
-.form-label {
-	display: block;
-	margin-bottom: 10px;
-	color: #424242;
-	font-size: 0.95rem;
-	font-weight: 500;
-}
-
-.form-control {
-	width: 100%;
-	padding: 10px 12px;
-	border: 1px solid #90caf9;
-	border-radius: 6px;
-	font-size: 1rem;
-	color: #333;
-	box-sizing: border-box;
-	transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.form-control:focus {
-	border-color: #1976d2;
-	outline: none;
-	box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
-}
-
-.btn-primary {
-	background-color: #1976d2;
-	color: #fff;
-	border: none;
-	padding: 14px 22px;
-	border-radius: 6px;
-	font-size: 1.05rem;
-	cursor: pointer;
-	transition: background-color 0.2s ease-in-out, transform 0.1s ease;
-	width: 100%;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary:hover {
-	background-color: #1565c0;
-	transform: translateY(-1px);
-	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-}
-
-.error-message {
-	color: red;
-	font-size: 0.9rem;
-	margin-top: 5px;
-	display: none;
-}
-
-.input-error {
-	border-color: red !important;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Rental Reservation - DriveLux</title>
+    <!-- Poppins Font Everywhere -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- SweetAlert2 & Confirm Alert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/confirm-alert.js"></script>
+    <!-- Application CSS -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-	<div class="container">
-		<h2>Update Rental</h2>
-		<form action="UpdateRentalActionServlet" method="post"
-			id="updateRentalForm">
-			<input type="hidden" name="rentalId" value="${rentalId}">
 
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Field</th>
-						<th>Value</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td><label for="rentalName" class="form-label">Rental
-								Name</label></td>
-						<td><input type="text" class="form-control" id="rentalName"
-							name="rentalName" value="${rentalName}">
-							<div id="rentalNameError" class="error-message"></div></td>
-					</tr>
+    <!-- Unified Navbar -->
+    <header class="rental-navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="admin-dashboard.jsp">
+                <div class="brand-badge" style="background: linear-gradient(135deg, #4f46e5, #0ea5e9);"><i class="fas fa-shield-alt"></i></div>
+                <span>Drive<span style="color: #60a5fa;">Lux</span> <small class="text-white-50 fs-6 fw-normal ms-1">Admin</small></span>
+            </a>
+            
+            <nav class="d-flex align-items-center gap-2">
+                <a class="btn-rental btn-rental-outline btn-rental-sm" href="manageRentals.jsp">
+                    <i class="fas fa-arrow-left"></i> Back to Rentals
+                </a>
+            </nav>
+        </div>
+    </header>
 
-					<tr>
-						<td><label for="rentStartDate" class="form-label">Rent
-								Start Date</label></td>
-						<td><input type="date" class="form-control"
-							id="rentStartDate" name="rentStartDate" value="${rentStartDate}">
-							<div id="rentStartDateError" class="error-message"></div></td>
-					</tr>
+    <div class="auth-wrapper" style="min-height: calc(100vh - 150px); background: #f8fafc; padding: 50px 20px;">
+        <div class="auth-card auth-card-wide shadow-lg border" style="background: #ffffff;">
+            <!-- Header -->
+            <div class="auth-header">
+                <span class="badge bg-primary-subtle text-primary border font-monospace px-3 py-2 rounded-pill mb-2">
+                    <i class="fas fa-receipt"></i> Rental Reference #${rentalId}
+                </span>
+                <h2 class="auth-title">Update Rental Details</h2>
+                <p class="auth-subtitle">Modify dates, assigned vehicle, or customer reservation status</p>
+            </div>
 
-					<tr>
-						<td><label for="rentEndDate" class="form-label">Rent
-								End Date</label></td>
-						<td><input type="date" class="form-control" id="rentEndDate"
-							name="rentEndDate" value="${rentEndDate}">
-							<div id="rentEndDateError" class="error-message"></div></td>
-					</tr>
+            <!-- Form to UpdateRentalActionServlet -->
+            <form action="UpdateRentalActionServlet" method="post" id="updateRentalForm">
+                <input type="hidden" name="rentalId" value="${rentalId}">
 
-					<tr>
-						<td><label for="rentalStatus" class="form-label">Rental
-								Status</label></td>
-						<td><input type="text" class="form-control" id="rentalStatus"
-							name="rentalStatus" value="${rentalStatus}">
-							<div id="rentalStatusError" class="error-message"></div></td>
-					</tr>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="form-group-custom">
+                            <label for="rentalName" class="form-label-custom">Rental Plan / Purpose</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-tag"></i>
+                                <input type="text" class="form-control-custom" id="rentalName" name="rentalName" 
+                                       value="${rentalName}" required>
+                            </div>
+                            <div id="rentalNameError" class="error-message"></div>
+                        </div>
+                    </div>
 
-					<tr>
-						<td><label for="custId" class="form-label">Customer
-								ID</label></td>
-						<td><input type="text" class="form-control" id="custId"
-							name="custId" value="${custId}">
-							<div id="custIdError" class="error-message"></div></td>
-					</tr>
+                    <div class="col-md-6">
+                        <div class="form-group-custom">
+                            <label for="rentStartDate" class="form-label-custom">Start Date</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                                <input type="date" class="form-control-custom" id="rentStartDate" name="rentStartDate" 
+                                       value="${rentStartDate}" required>
+                            </div>
+                            <div id="rentStartDateError" class="error-message"></div>
+                        </div>
+                    </div>
 
-					<tr>
-						<td><label for="carRegno" class="form-label">Car Reg
-								No</label></td>
-						<td><input type="text" class="form-control" id="carRegno"
-							name="carRegno" value="${carRegno}">
-							<div id="carRegnoError" class="error-message"></div></td>
-					</tr>
-				</tbody>
-			</table>
+                    <div class="col-md-6">
+                        <div class="form-group-custom">
+                            <label for="rentEndDate" class="form-label-custom">Return Date</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar-check"></i>
+                                <input type="date" class="form-control-custom" id="rentEndDate" name="rentEndDate" 
+                                       value="${rentEndDate}" required>
+                            </div>
+                            <div id="rentEndDateError" class="error-message"></div>
+                        </div>
+                    </div>
 
-			<button type="submit" class="btn btn-primary">Update Rental</button>
-		</form>
-	</div>
-	<script>
+                    <div class="col-md-4">
+                        <div class="form-group-custom">
+                            <label for="rentalStatus" class="form-label-custom">Reservation Status</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-traffic-light"></i>
+                                <select class="form-control-custom" id="rentalStatus" name="rentalStatus" required>
+                                    <option value="Available" ${rentalStatus == 'Available' ? 'selected' : ''}>Available</option>
+                                    <option value="Ongoing" ${rentalStatus == 'Ongoing' ? 'selected' : ''}>Ongoing</option>
+                                    <option value="Completed" ${rentalStatus == 'Completed' ? 'selected' : ''}>Completed</option>
+                                    <option value="Cancelled" ${rentalStatus == 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                </select>
+                            </div>
+                            <div id="rentalStatusError" class="error-message"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group-custom">
+                            <label for="custId" class="form-label-custom">Customer ID</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" class="form-control-custom" id="custId" name="custId" 
+                                       value="${custId}" required>
+                            </div>
+                            <div id="custIdError" class="error-message"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group-custom">
+                            <label for="carRegno" class="form-label-custom">Car Reg No</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-car"></i>
+                                <input type="text" class="form-control-custom" id="carRegno" name="carRegno" 
+                                       value="${carRegno}" required>
+                            </div>
+                            <div id="carRegnoError" class="error-message"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mt-4">
+                    <button type="submit" class="btn-rental btn-rental-primary flex-grow-1 py-3">
+                        <i class="fas fa-check"></i> Commit Rental Changes
+                    </button>
+                    <a href="manageRentals.jsp" class="btn-rental btn-rental-outline py-3 px-4">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="rental-footer">
+        <div class="container text-center">
+            <p class="mb-0 small text-muted">&copy; 2025 DriveLux DBMS Car Rental Management System. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Client Script -->
+    <script>
         const rentalNameInput = document.getElementById('rentalName');
         const rentStartDateInput = document.getElementById('rentStartDate');
         const rentEndDateInput = document.getElementById('rentEndDate');
-        const rentalStatusInput = document.getElementById('rentalStatus');
         const custIdInput = document.getElementById('custId');
         const carRegnoInput = document.getElementById('carRegno');
 
         const rentalNameError = document.getElementById('rentalNameError');
         const rentStartDateError = document.getElementById('rentStartDateError');
         const rentEndDateError = document.getElementById('rentEndDateError');
-        const rentalStatusError = document.getElementById('rentalStatusError');
         const custIdError = document.getElementById('custIdError');
         const carRegnoError = document.getElementById('carRegnoError');
 
         function validateRentalName() {
-            if (!/^[a-zA-Z\s]+$/.test(rentalNameInput.value)) {
-                rentalNameInput.classList.add('input-error');
-                rentalNameError.textContent = "Rental name must contain only letters and spaces";
-                rentalNameError.style.display = 'block';
+            if (rentalNameInput.value.trim() === "") {
+                rentalNameError.textContent = "Rental plan/name is required";
+                rentalNameInput.classList.add("error-border");
                 return false;
             } else {
-                rentalNameInput.classList.remove('input-error');
                 rentalNameError.textContent = '';
-                rentalNameError.style.display = 'none';
-                return true;
-            }
-        }
-
-        function validateRentStartDate() {
-            const today = new Date().toISOString().split('T')[0];
-            if (rentStartDateInput.value < today) {
-                rentStartDateInput.classList.add('input-error');
-                rentStartDateError.textContent = "Start date cannot be in the past";
-                rentStartDateError.style.display = 'block';
-                return false;
-            } else {
-                rentStartDateInput.classList.remove('input-error');
-                rentStartDateError.textContent = '';
-                rentStartDateError.style.display = 'none';
+                rentalNameInput.classList.remove("error-border");
                 return true;
             }
         }
 
         function validateRentEndDate() {
-            const today = new Date().toISOString().split('T')[0];
-            if (rentEndDateInput.value < today) {
-                rentEndDateInput.classList.add('input-error');
-                rentEndDateError.textContent = "End date cannot be in the past";
-                rentEndDateError.style.display = 'block';
-                return false;
-            } else if (rentEndDateInput.value < rentStartDateInput.value) {
-                rentEndDateInput.classList.add('input-error');
+            if (rentEndDateInput.value < rentStartDateInput.value) {
                 rentEndDateError.textContent = "End date cannot be earlier than start date";
-                rentEndDateError.style.display = 'block';
+                rentEndDateInput.classList.add("error-border");
                 return false;
             } else {
-                rentEndDateInput.classList.remove('input-error');
                 rentEndDateError.textContent = '';
-                rentEndDateError.style.display = 'none';
-                return true;
-            }
-        }
-
-        function validateRentalStatus() {
-            if (!/^[a-zA-Z\s]+$/.test(rentalStatusInput.value)) {
-                rentalStatusInput.classList.add('input-error');
-                rentalStatusError.textContent = "Rental status must contain only letters and spaces";
-                rentalStatusError.style.display = 'block';
-                return false;
-            } else {
-                rentalStatusInput.classList.remove('input-error');
-                rentalStatusError.textContent = '';
-                rentalStatusError.style.display = 'none';
+                rentEndDateInput.classList.remove("error-border");
                 return true;
             }
         }
 
         function validateCustId() {
-            if (!/^\d+$/.test(custIdInput.value)) {
-                custIdInput.classList.add('input-error');
+            if (!/^\d+$/.test(custIdInput.value.trim())) {
                 custIdError.textContent = "Customer ID must contain only numbers";
-                custIdError.style.display = 'block';
+                custIdInput.classList.add("error-border");
                 return false;
             } else {
-                custIdInput.classList.remove('input-error');
                 custIdError.textContent = '';
-                custIdError.style.display = 'none';
+                custIdInput.classList.remove("error-border");
                 return true;
             }
         }
 
         function validateCarRegno() {
-            if (!/^[a-zA-Z0-9]{10}$/.test(carRegnoInput.value)) {
-                carRegnoInput.classList.add('input-error');
-                carRegnoError.textContent = "Car Reg No must be 10 characters with letters and numbers";
-                carRegnoError.style.display = 'block';
+            if (carRegnoInput.value.trim() === "") {
+                carRegnoError.textContent = "Car Reg No is required";
+                carRegnoInput.classList.add("error-border");
                 return false;
             } else {
-                carRegnoInput.classList.remove('input-error');
                 carRegnoError.textContent = '';
-                carRegnoError.style.display = 'none';
+                carRegnoInput.classList.remove("error-border");
                 return true;
             }
         }
 
         rentalNameInput.addEventListener('input', validateRentalName);
-        rentStartDateInput.addEventListener('input', validateRentStartDate);
         rentEndDateInput.addEventListener('input', validateRentEndDate);
-        rentalStatusInput.addEventListener('input', validateRentalStatus);
         custIdInput.addEventListener('input', validateCustId);
         carRegnoInput.addEventListener('input', validateCarRegno);
 
         document.getElementById('updateRentalForm').addEventListener('submit', function(event) {
+            event.preventDefault();
             let hasErrors = false;
-
             if (!validateRentalName()) hasErrors = true;
-            if (!validateRentStartDate()) hasErrors = true;
             if (!validateRentEndDate()) hasErrors = true;
-            if (!validateRentalStatus()) hasErrors = true;
             if (!validateCustId()) hasErrors = true;
             if (!validateCarRegno()) hasErrors = true;
 
-            if (hasErrors) {
-                event.preventDefault();
+            if (!hasErrors) {
+                const self = this;
+                confirmAction({
+                    title: "Update Rental Record?",
+                    text: "Are you sure you want to save modifications to Rental #${rentalId}?",
+                    confirmText: "Yes, Update",
+                    cancelText: "Review",
+                    onConfirm: () => {
+                        self.submit();
+                    }
+                });
             }
         });
     </script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
