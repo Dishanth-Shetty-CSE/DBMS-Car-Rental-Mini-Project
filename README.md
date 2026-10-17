@@ -321,16 +321,6 @@ DBMS-CAR-RENTAL-MANAGEMENT-SYSTEM/
 
 ---
 
-## 👥 Contributors & Academic Credits
-
-This project was engineered as part of the **DBMS Laboratory with Mini Project** in the **Bachelor of Technology (B.Tech) in Computer Science & Engineering** curriculum:
-
-* **Dishanth Shetty** (`NNM24CS506`) - *Lead Development & Database Architecture*
-* **Akshay Karunakar Naik** (`NNM24CS502`) - *Full-Stack Integration & Project Co-Author*
-
-**Institution**:
-* **NMAM Institute of Technology (NMAMIT)**
-* *Off-Campus Center of Nitte (Deemed to be University), Nitte - 574110, Karnataka, India*
 
 ---
 
