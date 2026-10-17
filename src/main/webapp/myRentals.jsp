@@ -83,8 +83,12 @@
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/car_rental_db", "root", "trickortreat");
 
-                String query = "SELECT r.Rental_ID, r.Rental_Name, r.Rent_Start_Date, r.Rent_End_Date, r.Rental_Status, r.Car_Regno, c.Car_Model " +
-                               "FROM Rental r LEFT JOIN Car c ON r.Car_Regno = c.Car_Regno " +
+                String query = "SELECT r.Rental_ID, r.Rental_Name, r.Rent_Start_Date, r.Rent_End_Date, r.Rental_Status, r.Car_Regno, c.Car_Model, " +
+                               "p.Amount_Paid, p.Pay_Status, p.Pay_Method " +
+                               "FROM Rental r " +
+                               "LEFT JOIN Car c ON r.Car_Regno = c.Car_Regno " +
+                               "LEFT JOIN (SELECT Rental_ID, MAX(Pay_ID) as max_pay_id FROM Payment GROUP BY Rental_ID) latest_p ON r.Rental_ID = latest_p.Rental_ID " +
+                               "LEFT JOIN Payment p ON latest_p.max_pay_id = p.Pay_ID " +
                                "WHERE r.Cust_ID = ? ORDER BY r.Rental_ID DESC";
                 stmt = conn.prepareStatement(query);
                 stmt.setString(1, customerID);
@@ -104,6 +108,10 @@
                     row.put("status", status != null ? status : "Available");
                     row.put("regNo", rs.getString("Car_Regno") != null ? rs.getString("Car_Regno") : "N/A");
                     row.put("carModel", rs.getString("Car_Model") != null ? rs.getString("Car_Model") : "Rental Vehicle");
+                    double amtPaid = rs.getDouble("Amount_Paid");
+                    row.put("amountPaid", String.valueOf(amtPaid));
+                    row.put("payStatus", rs.getString("Pay_Status") != null ? rs.getString("Pay_Status") : "Pending");
+                    row.put("payMethod", rs.getString("Pay_Method") != null ? rs.getString("Pay_Method") : "N/A");
                     rentalsList.add(row);
                 }
             } catch (Exception e) {
@@ -173,13 +181,14 @@
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Status</th>
-                            <th class="text-center">Action / Payment</th>
+                            <th>Amount & Payment</th>
+                            <th class="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <% if (rentalsList.isEmpty()) { %>
                         <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
+                            <td colspan="8" class="text-center py-5 text-muted">
                                 <i class="fas fa-folder-open fs-2 mb-2 d-block text-secondary"></i>
                                 <h5>No Rental Reservations Found</h5>
                                 <p class="small mb-3">You haven't reserved any vehicles yet. Explore our fleet today!</p>
@@ -195,6 +204,10 @@
                                 String status = row.get("status");
                                 String reg = row.get("regNo");
                                 String model = row.get("carModel");
+                                String payStatus = row.get("payStatus");
+                                String payMethod = row.get("payMethod");
+                                double amtPaid = 0.0;
+                                try { amtPaid = Double.parseDouble(row.get("amountPaid")); } catch (Exception ignored) {}
 
                                 String badgeClass = "badge-available";
                                 String icon = "fa-check";
@@ -223,10 +236,26 @@
                                     <i class="fas <%= icon %>"></i> <%= status %>
                                 </span>
                             </td>
+                            <td>
+                                <% if ("Completed".equalsIgnoreCase(payStatus) && amtPaid > 0.0) { %>
+                                    <div class="fw-bold text-success">&#8377;<%= String.format(java.util.Locale.US, "%,.2f", amtPaid) %></div>
+                                    <div class="small text-muted"><i class="fas fa-check-circle text-success me-1"></i><%= payMethod %></div>
+                                <% } else { %>
+                                    <span class="badge bg-warning-subtle text-warning fw-semibold">
+                                        <i class="fas fa-clock me-1"></i>Payment Pending
+                                    </span>
+                                <% } %>
+                            </td>
                             <td class="text-center">
-                                <a href="payments.jsp?rentalId=<%= rId %>" class="btn-rental btn-rental-outline btn-rental-sm" title="View or Pay Invoice">
-                                    <i class="fas fa-credit-card text-success"></i> Payment Desk
-                                </a>
+                                <% if ("Completed".equalsIgnoreCase(payStatus) && amtPaid > 0.0) { %>
+                                    <a href="payments.jsp?rentalId=<%= rId %>" class="btn-rental btn-rental-outline btn-rental-sm" title="View Paid Receipt">
+                                        <i class="fas fa-file-invoice text-success"></i> Receipt
+                                    </a>
+                                <% } else { %>
+                                    <a href="payments.jsp?rentalId=<%= rId %>" class="btn-rental btn-rental-primary btn-rental-sm" title="Complete Payment">
+                                        <i class="fas fa-credit-card"></i> Pay Now
+                                    </a>
+                                <% } %>
                             </td>
                         </tr>
                         <%  } 

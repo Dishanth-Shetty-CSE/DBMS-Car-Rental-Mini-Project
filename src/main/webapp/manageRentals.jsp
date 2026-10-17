@@ -83,6 +83,7 @@
                             <th>Rental Name / Plan</th>
                             <th>Rental Period</th>
                             <th>Status</th>
+                            <th>Payment</th>
                             <th>Cust ID</th>
                             <th>Car Reg No</th>
                             <th class="text-center">Actions</th>
@@ -96,7 +97,12 @@
                             try {
                                 Class.forName("com.mysql.cj.jdbc.Driver");
                                 connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/car_rental_db", "root", "trickortreat");
-                                String query = "SELECT Rental_ID, Rental_Name, Rent_Start_Date, Rent_End_Date, Rental_Status, Cust_ID, Car_Regno FROM Rental ORDER BY Rental_ID DESC";
+                                String query = "SELECT r.Rental_ID, r.Rental_Name, r.Rent_Start_Date, r.Rent_End_Date, r.Rental_Status, r.Cust_ID, r.Car_Regno, " +
+                                               "p.Amount_Paid, p.Pay_Status, p.Pay_Method " +
+                                               "FROM Rental r " +
+                                               "LEFT JOIN (SELECT Rental_ID, MAX(Pay_ID) as max_pay_id FROM Payment GROUP BY Rental_ID) latest_p ON r.Rental_ID = latest_p.Rental_ID " +
+                                               "LEFT JOIN Payment p ON latest_p.max_pay_id = p.Pay_ID " +
+                                               "ORDER BY r.Rental_ID DESC";
                                 preparedStatement = connection.prepareStatement(query);
                                 resultSet = preparedStatement.executeQuery();
                                 
@@ -108,6 +114,9 @@
                                     String rStatus = resultSet.getString("Rental_Status");
                                     int custId = resultSet.getInt("Cust_ID");
                                     String carReg = resultSet.getString("Car_Regno");
+                                    double pAmount = resultSet.getDouble("Amount_Paid");
+                                    String pStatus = resultSet.getString("Pay_Status");
+                                    String pMethod = resultSet.getString("Pay_Method");
 
                                     String badgeClass = "badge-available";
                                     String icon = "fa-check";
@@ -140,6 +149,18 @@
                                 <span class="badge-custom <%= badgeClass %>">
                                     <i class="fas <%= icon %>"></i> <%= rStatus %>
                                 </span>
+                            </td>
+                            <td>
+                                <% if ("Completed".equalsIgnoreCase(pStatus) && pAmount > 0.0) { %>
+                                    <span class="badge bg-success-subtle text-success font-monospace fw-bold">
+                                        &#8377;<%= String.format(java.util.Locale.US, "%,.2f", pAmount) %>
+                                    </span>
+                                    <div class="small text-muted"><%= pMethod != null ? pMethod : "Paid" %></div>
+                                <% } else { %>
+                                    <span class="badge bg-warning-subtle text-warning fw-semibold">
+                                        <i class="fas fa-clock me-1"></i>Pending
+                                    </span>
+                                <% } %>
                             </td>
                             <td>
                                 <a href="ManageCustomers.jsp" class="badge bg-light text-dark border text-decoration-none" title="View Customer Details">
