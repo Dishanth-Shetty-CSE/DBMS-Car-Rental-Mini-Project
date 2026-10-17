@@ -153,34 +153,6 @@ erDiagram
 
 ---
 
-## 🔑 Default Demo Credentials
-
-The database script (`Car-Rental-Management-DB.sql`) seeds ready-to-test accounts with SHA-256 encrypted credentials:
-
-### 👑 System Administrator
-* **Portal**: `AdminLogin.jsp`
-* **Email**: `admin@carrental.com`
-* **Password**: `Admin@123`
-
-### 👥 Pre-Configured Customer Accounts
-* **Portal**: `login.jsp`
-* **Password Pattern**: `FirstName@123` (e.g. First name with capital initial followed by `@123`)
-
-| Customer Name | Email ID | Password | Contact Phone | Registered City |
-| :--- | :--- | :--- | :--- | :--- |
-| **Aarav Sharma** | `aarav.sharma@gmail.com` | `Aarav@123` | `9845012345` | Bengaluru, KA |
-| **Rohan Mehta** | `rohan.mehta@yahoo.com` | `Rohan@123` | `9820198765` | Mumbai, MH |
-| **Priya Nair** | `priya.nair@outlook.com` | `Priya@123` | `9744123456` | Chennai, TN |
-| **Sneha Patel** | `sneha.patel@gmail.com` | `Sneha@123` | `9898034567` | Ahmedabad, GJ |
-| **Vikram Singh** | `vikram.singh@gmail.com` | `Vikram@123` | `9414056789` | Jaipur, RJ |
-| **Ananya Deshmukh** | `ananya.deshmukh@gmail.com` | `Ananya@123` | `9850023456` | Pune, MH |
-| **Rahul Verma** | `rahul.verma@hotmail.com` | `Rahul@123` | `9811098765` | New Delhi, DL |
-| **Kavita Reddy** | `kavita.reddy@gmail.com` | `Kavita@123` | `9849012345` | Hyderabad, TS |
-| **Aditya Roy** | `aditya.roy@gmail.com` | `Aditya@123` | `9830056789` | Kolkata, WB |
-| **Pooja Fernandes**| `pooja.fernandes@yahoo.com` | `Pooja@123` | `9822145678` | Panaji, Goa |
-
----
-
 ## 🚀 Quick Start & Installation
 
 ### 1. Prerequisites
@@ -318,9 +290,6 @@ DBMS-CAR-RENTAL-MANAGEMENT-SYSTEM/
 | `/ManageLocations.jsp` | `ManageLocations.jsp` | Transit hubs & mobility stations directory | Admin |
 | `/processRent` | `processRent.java` | Processes vehicle reservations | Customer |
 | `/processPayment` | `processPayment.java` | Records transaction amount and settles booking | Customer |
-
----
-
 
 ---
 
